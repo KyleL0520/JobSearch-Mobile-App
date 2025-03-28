@@ -1,0 +1,92 @@
+import 'package:flutter/material.dart';
+import 'package:frontend/src/styles/app_colors.dart';
+import 'package:frontend/src/ui/screens/employee/job_details.dart';
+
+class JobCard extends StatefulWidget {
+  final String title;
+  final String company;
+  final String location;
+  final String logoPath;
+  final bool isShowBookmark;
+  const JobCard({
+    super.key,
+    required this.title,
+    required this.company,
+    required this.location,
+    required this.logoPath, required this.isShowBookmark,
+  });
+
+  @override
+  State<JobCard> createState() => _JobCardState();
+}
+
+class _JobCardState extends State<JobCard> {
+  bool isBookmarked = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+             Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => JobDetailsScreen()),
+            );
+      },
+      child: Card(
+        margin: EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: AppColors.grey,
+        child: Padding(
+          padding: EdgeInsets.all(12),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 55,
+                height: 55,
+                child: Image.asset(widget.logoPath, fit: BoxFit.cover),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: AppColors.black,
+                      ),
+                    ),
+                    Text(
+                      widget.company,
+                      style: TextStyle(fontSize: 13, color: AppColors.black),
+                    ),
+                    Text(
+                      widget.location,
+                      style: TextStyle(fontSize: 10, color: AppColors.black),
+                    ),
+                  ],
+                ),
+              ),
+              widget.isShowBookmark
+                  ? IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isBookmarked = !isBookmarked;
+                      });
+                    },
+                    icon: Icon(
+                      isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                      color: AppColors.black,
+                      size: 24,
+                    ),
+                  )
+                  : SizedBox(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
