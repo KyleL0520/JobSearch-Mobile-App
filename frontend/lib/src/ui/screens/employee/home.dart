@@ -3,8 +3,8 @@ import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
 import 'package:frontend/src/ui/widgets/job_card.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class EmployeeHomeScreen extends StatelessWidget {
+  const EmployeeHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

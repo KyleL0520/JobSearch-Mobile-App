@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
-import 'package:frontend/src/ui/widgets/popupForm/cover_letter.dart';
+import 'package:frontend/src/ui/widgets/form_title.dart';
 import 'package:frontend/src/ui/widgets/popupForm/popup_form.dart';
-import 'package:frontend/src/ui/widgets/popupForm/profile_option.dart';
+import 'package:frontend/src/ui/widgets/popupForm/radio_option.dart';
 
-class JobDetailsScreen extends StatelessWidget {
-  const JobDetailsScreen({super.key});
+class EmployeeJobDetailsScreen extends StatelessWidget {
+  const EmployeeJobDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -134,9 +134,50 @@ class JobDetailsScreen extends StatelessWidget {
                               child: Column(
                                 children: [
                                   SizedBox(height: 30),
-                                  ProfileOption(),
+                                  CustomFormTitle(title: 'Profile'),
+                                  RadioOption(
+                                    title: 'Web Dev Profile',
+                                    viewArrow: true,
+                                  ),
+                                  RadioOption(
+                                    title: 'Event Crew Profile',
+                                    viewArrow: true,
+                                  ),
+                                  RadioOption(
+                                    title: 'Mobile Dev Profile',
+                                    viewArrow: true,
+                                  ),
                                   SizedBox(height: 30),
-                                  CoverLetter(),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CustomFormTitle(title: 'Cover Letter'),
+                                      TextButton(
+                                        onPressed: () {},
+                                        child: Text(
+                                          'Upload',
+                                          style: TextStyle(
+                                            color: AppColors.yellow,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  RadioOption(
+                                    title: 'CoverLetter.pdf',
+                                    viewArrow: true,
+                                  ),
+                                  RadioOption(
+                                    title: 'Write a cover letter',
+                                    viewArrow: true,
+                                  ),
+                                  RadioOption(
+                                    title: "Don't include a cover letter",
+                                    viewArrow: true,
+                                  ),
                                 ],
                               ),
                             );

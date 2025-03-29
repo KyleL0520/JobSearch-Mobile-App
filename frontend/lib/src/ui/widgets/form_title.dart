@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 
-class CustomPopupFormTitle extends StatelessWidget {
+class CustomFormTitle extends StatelessWidget {
   final String title;
-  const CustomPopupFormTitle({super.key, required this.title});
+  const CustomFormTitle({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {

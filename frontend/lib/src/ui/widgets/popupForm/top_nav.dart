@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
-import 'package:frontend/src/ui/widgets/popupForm/title.dart';
+import 'package:frontend/src/ui/widgets/form_title.dart';
 
 class PopupFormTopNav extends StatelessWidget {
   final String title;
@@ -27,7 +27,7 @@ class PopupFormTopNav extends StatelessWidget {
             ),
           ),
         ),
-        CustomPopupFormTitle(title: title),
+        CustomFormTitle(title: title),
         btnSubmit
             ? GestureDetector(
               onTap: () {},

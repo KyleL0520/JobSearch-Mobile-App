@@ -17,10 +17,10 @@ class _EmployeeMainScreenState extends State<EmployeeMainScreen> {
   Menus currentIndex = Menus.home;
 
   final screens = [
-    HomeScreen(),
-    ActivityScreen(),
+    EmployeeHomeScreen(),
+    EmployeeActivityScreen(),
     CommunityScreen(),
-    ProfileScreen(),
+    EmployeeProfileScreen(),
   ];
 
   @override

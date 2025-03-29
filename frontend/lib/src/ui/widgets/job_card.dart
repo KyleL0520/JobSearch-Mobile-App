@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
-import 'package:frontend/src/ui/screens/employee/job_details.dart';
+import 'package:frontend/src/ui/screens/employer/job_details.dart';
 
 class JobCard extends StatefulWidget {
   final String title;
@@ -27,9 +27,13 @@ class _JobCardState extends State<JobCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-             Navigator.push(
+            //  Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => EmployeeJobDetailsScreen()),
+            // );
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => JobDetailsScreen()),
+              MaterialPageRoute(builder: (context) => EmployerJobDetailsScreen(title: widget.title,)),
             );
       },
       child: Card(

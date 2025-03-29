@@ -4,14 +4,14 @@ import 'package:frontend/src/ui/widgets/app_bar.dart';
 import 'package:frontend/src/ui/widgets/job_card.dart';
 import 'package:frontend/src/ui/widgets/job_card_applied.dart';
 
-class ActivityScreen extends StatefulWidget {
-  const ActivityScreen({super.key});
+class EmployeeActivityScreen extends StatefulWidget {
+  const EmployeeActivityScreen({super.key});
 
   @override
-  State<ActivityScreen> createState() => _ActivityScreenState();
+  State<EmployeeActivityScreen> createState() => _EmployeeActivityScreenState();
 }
 
-class _ActivityScreenState extends State<ActivityScreen> {
+class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
   bool isSavedSelected = true;
 
   @override
