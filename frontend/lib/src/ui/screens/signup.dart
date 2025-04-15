@@ -6,7 +6,7 @@ import 'package:frontend/src/ui/widgets/textfield/email.dart';
 import 'package:frontend/src/ui/widgets/textfield/location.dart';
 import 'package:frontend/src/ui/widgets/textfield/password.dart';
 import 'package:frontend/src/ui/widgets/textfield/phone.dart';
-import 'package:frontend/src/ui/widgets/title.dart';
+import 'package:frontend/src/ui/widgets/title/title.dart';
 import 'package:frontend/src/ui/widgets/textfield/username.dart';
 
 class SignUpScreen extends StatelessWidget {

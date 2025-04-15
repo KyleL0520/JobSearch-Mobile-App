@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/provider/job.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/widgets/popupForm/popup_form.dart';
+import 'package:provider/provider.dart';
 
 class JobCardApplied extends StatefulWidget {
-  final String title;
-  final String company;
-  final String location;
-  final String logoPath;
   final String formTitle;
   final Widget child;
   const JobCardApplied({
     super.key,
-    required this.title,
-    required this.company,
-    required this.location,
-    required this.logoPath,
     required this.formTitle,
     required this.child,
   });
@@ -24,8 +18,11 @@ class JobCardApplied extends StatefulWidget {
 }
 
 class _JobCardAppliedState extends State<JobCardApplied> {
+  
   @override
   Widget build(BuildContext context) {
+    final job = Provider.of<JobProvider>(context).job;
+
     return GestureDetector(
       onTap: () {
         PopupForm.show(context, widget.formTitle, false, widget.child);
@@ -41,7 +38,7 @@ class _JobCardAppliedState extends State<JobCardApplied> {
               SizedBox(
                 width: 55,
                 height: 55,
-                child: Image.asset(widget.logoPath, fit: BoxFit.cover),
+                child: Image.asset(job!.logoPath, fit: BoxFit.cover),
               ),
               SizedBox(width: 12),
               Expanded(
@@ -49,7 +46,7 @@ class _JobCardAppliedState extends State<JobCardApplied> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.title,
+                      job.title,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -57,11 +54,11 @@ class _JobCardAppliedState extends State<JobCardApplied> {
                       ),
                     ),
                     Text(
-                      widget.company,
+                      job.company,
                       style: TextStyle(fontSize: 13, color: AppColors.black),
                     ),
                     Text(
-                      widget.location,
+                      job.location,
                       style: TextStyle(fontSize: 10, color: AppColors.black),
                     ),
                   ],

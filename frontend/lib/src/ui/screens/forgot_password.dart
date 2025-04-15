@@ -3,7 +3,7 @@ import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/screens/login.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
 import 'package:frontend/src/ui/widgets/textfield/email.dart';
-import 'package:frontend/src/ui/widgets/title.dart';
+import 'package:frontend/src/ui/widgets/title/title.dart';
 
 class FrogotPasswordScreen extends StatelessWidget {
   final emailController = TextEditingController();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
-import 'package:frontend/src/ui/widgets/job_card.dart';
+import 'package:frontend/src/ui/widgets/jobCard/job_card.dart';
 
 class EmployeeHomeScreen extends StatelessWidget {
   const EmployeeHomeScreen({super.key});
@@ -38,10 +38,6 @@ class EmployeeHomeScreen extends StatelessWidget {
                 itemCount: 3,
                 itemBuilder: (context, index) {
                   return JobCard(
-                    title: "Full-Stack Web Developer",
-                    company: "Shopee",
-                    location: "Mid valley, Kuala Lumpur",
-                    logoPath: "assets/images/shopee.jpg",
                     isShowBookmark: true,
                   );
                 },

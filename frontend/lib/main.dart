@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/config/route/app_routes.dart';
+import 'package:frontend/src/provider/job.dart';
 import 'package:frontend/src/styles/app_colors.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(create: (_) => JobProvider(), child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

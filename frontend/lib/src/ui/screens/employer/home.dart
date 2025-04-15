@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/screens/employer/job_details.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
-import 'package:frontend/src/ui/widgets/job_card.dart';
+import 'package:frontend/src/ui/widgets/jobCard/job_card.dart';
 
 class EmployerHomeScreen extends StatelessWidget {
   const EmployerHomeScreen({super.key});
@@ -16,7 +16,9 @@ class EmployerHomeScreen extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => EmployerJobDetailsScreen(title: 'Title',))
+            MaterialPageRoute(
+              builder: (context) => EmployerJobDetailsScreen(isView: false,),
+            ),
           );
         },
         backgroundColor: AppColors.yellow,
@@ -33,11 +35,7 @@ class EmployerHomeScreen extends StatelessWidget {
                 itemCount: 1,
                 itemBuilder: (context, index) {
                   return JobCard(
-                    title: "Full-Stack Web Developer",
-                    company: "Shopee",
-                    location: "Mid valley, Kuala Lumpur",
-                    logoPath: "assets/images/shopee.jpg",
-                    isShowBookmark: true,
+                    isShowBookmark: false,
                   );
                 },
               ),

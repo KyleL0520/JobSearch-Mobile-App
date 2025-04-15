@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/screens/employee/main_screen.dart';
 import 'package:frontend/src/ui/screens/forgot_password.dart';
-import 'package:frontend/src/ui/screens/main_screen.dart';
+import 'package:frontend/src/ui/screens/employer/main_screen.dart';
 import 'package:frontend/src/ui/screens/signup.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
 import 'package:frontend/src/ui/widgets/textfield/email.dart';
 import 'package:frontend/src/ui/widgets/textfield/password.dart';
-import 'package:frontend/src/ui/widgets/title.dart';
+import 'package:frontend/src/ui/widgets/title/title.dart';
 
 class LoginScreen extends StatelessWidget {
   final emailController = TextEditingController();

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/provider/job.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
-import 'package:frontend/src/ui/widgets/job_card.dart';
-import 'package:frontend/src/ui/widgets/job_card_applied.dart';
+import 'package:frontend/src/ui/widgets/button/redButton.dart';
+import 'package:frontend/src/ui/widgets/jobCard/job_card.dart';
+import 'package:frontend/src/ui/widgets/jobCard/job_card_applied.dart';
+import 'package:provider/provider.dart';
 
 class EmployeeActivityScreen extends StatefulWidget {
   const EmployeeActivityScreen({super.key});
@@ -16,6 +19,8 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final job = Provider.of<JobProvider>(context).job;
+
     return Scaffold(
       appBar: CustomAppBar(title: 'Activity', isCenterTitle: false),
       body: Padding(
@@ -82,25 +87,15 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
                 itemCount: 1,
                 itemBuilder: (context, index) {
                   return isSavedSelected
-                      ? JobCard(
-                        title: "Full-Stack Web Developer",
-                        company: "Shopee",
-                        location: "Mid valley, Kuala Lumpur",
-                        logoPath: "assets/images/shopee.jpg",
-                        isShowBookmark: true,
-                      )
+                      ? JobCard(isShowBookmark: true)
                       : JobCardApplied(
-                        title: "Full-Stack Web Developer",
-                        company: "Shopee",
-                        location: "Mid valley, Kuala Lumpur",
-                        logoPath: "assets/images/shopee.jpg",
                         formTitle: 'View Application',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             SizedBox(height: 30),
                             Text(
-                              'Full-Stack Web Developer',
+                              job!.title,
                               style: TextStyle(
                                 color: AppColors.white,
                                 fontSize: 20,
@@ -109,7 +104,7 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
                             ),
                             SizedBox(height: 7),
                             Text(
-                              'Shopee',
+                              job.company,
                               style: TextStyle(
                                 color: AppColors.white,
                                 fontSize: 15,
@@ -118,7 +113,7 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
                             ),
                             SizedBox(height: 7),
                             Text(
-                              'Kuala Lumpur',
+                              job.location,
                               style: TextStyle(
                                 color: AppColors.white,
                                 fontSize: 15,
@@ -182,23 +177,7 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
                               ),
                             ),
                             SizedBox(height: 30),
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.darkRed,
-                                padding: EdgeInsets.symmetric(vertical: 11),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: Text(
-                                'Delete',
-                                style: TextStyle(
-                                  color: AppColors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                            Row(children: [RedButton(text: 'Delete')]),
                           ],
                         ),
                       );

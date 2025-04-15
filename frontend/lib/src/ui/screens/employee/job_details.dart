@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
-import 'package:frontend/src/ui/widgets/form_title.dart';
+import 'package:frontend/src/ui/widgets/title/form_title.dart';
 import 'package:frontend/src/ui/widgets/popupForm/popup_form.dart';
 import 'package:frontend/src/ui/widgets/popupForm/radio_option.dart';
 
@@ -10,6 +10,9 @@ class EmployeeJobDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? selectedProfile = 'Web Dev Profile';
+    String? selectedCoverLetter = "Don't include a cover letter";
+
     return Scaffold(
       appBar: CustomAppBar(title: 'Job Details', isCenterTitle: true),
       body: SingleChildScrollView(
@@ -135,16 +138,12 @@ class EmployeeJobDetailsScreen extends StatelessWidget {
                                 children: [
                                   SizedBox(height: 30),
                                   CustomFormTitle(title: 'Profile'),
-                                  RadioOption(
-                                    title: 'Web Dev Profile',
-                                    viewArrow: true,
-                                  ),
-                                  RadioOption(
-                                    title: 'Event Crew Profile',
-                                    viewArrow: true,
-                                  ),
-                                  RadioOption(
-                                    title: 'Mobile Dev Profile',
+                                  RadioOptionGroup(
+                                    options: [
+                                      'Web Dev Profile',
+                                      'Event Crew Profile',
+                                      "Mobile Dev Profile",
+                                    ],
                                     viewArrow: true,
                                   ),
                                   SizedBox(height: 30),
@@ -166,16 +165,14 @@ class EmployeeJobDetailsScreen extends StatelessWidget {
                                     ],
                                   ),
                                   SizedBox(height: 10),
-                                  RadioOption(
-                                    title: 'CoverLetter.pdf',
-                                    viewArrow: true,
-                                  ),
-                                  RadioOption(
-                                    title: 'Write a cover letter',
-                                    viewArrow: true,
-                                  ),
-                                  RadioOption(
-                                    title: "Don't include a cover letter",
+                                  RadioOptionGroup(
+                                    options: [
+                                      'CoverLetter.pdf',
+                                      'Write a cover letter',
+                                      "Don't include a cover letter",
+                                    ],
+                                    initialValue:
+                                        "Don't include a cover letter",
                                     viewArrow: true,
                                   ),
                                 ],
