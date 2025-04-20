@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
-import 'package:frontend/src/ui/widgets/title/form_title.dart';
 
 class PayRangeTextField extends StatefulWidget {
   final TextEditingController textController;

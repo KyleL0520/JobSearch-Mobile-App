@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/class/role.dart';
+import 'package:frontend/src/provider/role.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/screens/login.dart';
+import 'package:provider/provider.dart';
 
 class StartScreen extends StatelessWidget {
   const StartScreen({super.key});
@@ -15,9 +18,15 @@ class StartScreen extends StatelessWidget {
             Spacer(),
             TextButton(
               onPressed: () {
+                Provider.of<RoleProvider>(
+                    context,
+                    listen: false,
+                  ).setRole(Role(isEmployee: true));
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginScreen(isEmployee: true)),
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ),
                 );
               },
               child: Text(
@@ -38,9 +47,15 @@ class StartScreen extends StatelessWidget {
             SizedBox(height: 50),
             TextButton(
               onPressed: () {
+                Provider.of<RoleProvider>(
+                    context,
+                    listen: false,
+                  ).setRole(Role(isEmployee: false));
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginScreen(isEmployee: false)),
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ),
                 );
               },
               child: Text(
