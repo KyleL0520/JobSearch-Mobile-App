@@ -1,25 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/provider/role.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/screens/employee/main_screen.dart';
 import 'package:frontend/src/ui/screens/forgot_password.dart';
-import 'package:frontend/src/ui/screens/main_screen.dart';
+import 'package:frontend/src/ui/screens/employer/main_screen.dart';
 import 'package:frontend/src/ui/screens/signup.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
-import 'package:frontend/src/ui/widgets/textfield/email.dart';
+import 'package:frontend/src/ui/widgets/textfield/auth_text_field.dart';
 import 'package:frontend/src/ui/widgets/textfield/password.dart';
-import 'package:frontend/src/ui/widgets/title.dart';
+import 'package:frontend/src/ui/widgets/title/title.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final bool isEmployee;
-  LoginScreen({super.key, required this.isEmployee});
+  final String emailPattern =
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+
+  LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final role = Provider.of<RoleProvider>(context).role;
+
+    if (role == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
       appBar: CustomAppBar(
-        title: isEmployee ? 'Employee' : 'Employer',
+        title: role.isEmployee ? 'Employee' : 'Employer',
         isCenterTitle: true,
       ),
       body: SingleChildScrollView(
@@ -30,8 +40,13 @@ class LoginScreen extends StatelessWidget {
               SizedBox(height: 40),
               CustomTitle(title: 'Log In', isCenterTitle: false),
               SizedBox(height: 40),
-              EmailTextField(emailController: emailController),
-              SizedBox(height: 16),
+              AuthTextField(
+                textController: emailController,
+                regex: emailPattern,
+                hintText: 'Email',
+                icon: Icons.email_outlined,
+                specifiedErrorMessage: 'Invalid email format',
+              ),
               PasswordTextField(passwordController: passwordController),
               Align(
                 alignment: Alignment.centerRight,
@@ -42,7 +57,7 @@ class LoginScreen extends StatelessWidget {
                       MaterialPageRoute(
                         builder:
                             (context) =>
-                                FrogotPasswordScreen(isEmployee: isEmployee),
+                                FrogotPasswordScreen(),
                       ),
                     );
                   },
@@ -68,7 +83,7 @@ class LoginScreen extends StatelessWidget {
                       MaterialPageRoute(
                         builder:
                             (context) =>
-                                isEmployee
+                                role.isEmployee
                                     ? EmployeeMainScreen()
                                     : EmployerMainScreen(),
                       ),
@@ -104,7 +119,7 @@ class LoginScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder:
-                              (context) => SignUpScreen(isEmployee: isEmployee),
+                              (context) => SignUpScreen(),
                         ),
                       );
                     },

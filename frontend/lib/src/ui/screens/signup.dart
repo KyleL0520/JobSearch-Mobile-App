@@ -1,28 +1,96 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/database/auth/auth_service.dart';
+import 'package:frontend/src/class/role.dart';
+import 'package:frontend/src/provider/role.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/screens/login.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
-import 'package:frontend/src/ui/widgets/textfield/email.dart';
-import 'package:frontend/src/ui/widgets/textfield/location.dart';
+import 'package:frontend/src/ui/widgets/textfield/auth_text_field.dart';
 import 'package:frontend/src/ui/widgets/textfield/password.dart';
-import 'package:frontend/src/ui/widgets/textfield/phone.dart';
-import 'package:frontend/src/ui/widgets/title.dart';
-import 'package:frontend/src/ui/widgets/textfield/username.dart';
+import 'package:frontend/src/ui/widgets/title/title.dart';
+import 'package:provider/provider.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneNumberController = TextEditingController();
   final locationController = TextEditingController();
   final passwordController = TextEditingController();
-  final bool isEmployee;
-  SignUpScreen({super.key, required this.isEmployee});
+
+  final String emailPattern =
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+  final String phoneNumberPattern = r'^\+?[0-9]{7,15}$';
+  final String passwordPattern =
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,16}$';
+
+  String errorMessage = '';
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    emailController.dispose();
+    phoneNumberController.dispose();
+    locationController.dispose();
+    passwordController.dispose();
+  }
+
+  void register(BuildContext context, Role role) async {
+    String name = usernameController.text.trim();
+    String email = emailController.text.trim();
+    String phoneNumber = phoneNumberController.text.trim();
+    String location = locationController.text.trim();
+    String password = passwordController.text.trim();
+
+    if (name.isEmpty ||
+        email.isEmpty ||
+        phoneNumber.isEmpty ||
+        location.isEmpty ||
+        password.isEmpty ||
+        !RegExp(emailPattern).hasMatch(email) ||
+        !RegExp(phoneNumberPattern).hasMatch(phoneNumber) ||
+        !RegExp(passwordPattern).hasMatch(password)) {
+      return;
+    }
+
+    try {
+      await authService.value.createAccount(
+        name: name,
+        email: email,
+        phoneNumber: phoneNumber,
+        location: location,
+        password: password,
+        isEmployee: role.isEmployee,
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message ?? 'There is an error in sign up page';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final role = Provider.of<RoleProvider>(context).role;
+
+    if (role == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
       appBar: CustomAppBar(
-        title: isEmployee ? 'Employee' : 'Employer',
+        title: role.isEmployee ? 'Employee' : 'Employer',
         isCenterTitle: true,
       ),
       body: SingleChildScrollView(
@@ -33,31 +101,37 @@ class SignUpScreen extends StatelessWidget {
               SizedBox(height: 40),
               CustomTitle(title: 'Sign Up', isCenterTitle: false),
               SizedBox(height: 40),
-              UsernameTextField(usernameController: usernameController),
-              SizedBox(height: 16),
-              EmailTextField(emailController: emailController),
-              SizedBox(height: 16),
-              PhoneNumberTextField(
-                phoneNumberController: phoneNumberController,
+              AuthTextField(
+                textController: usernameController,
+                hintText: 'Name',
+                icon: Icons.person_outline_rounded,
               ),
-              SizedBox(height: 16),
-              LocationTextField(locationController: locationController),
-              SizedBox(height: 16),
+              AuthTextField(
+                textController: emailController,
+                regex: emailPattern,
+                hintText: 'Email',
+                icon: Icons.email_outlined,
+                specifiedErrorMessage: 'Invalid email format',
+              ),
+              AuthTextField(
+                textController: phoneNumberController,
+                regex: phoneNumberPattern,
+                hintText: 'Phone Number',
+                icon: Icons.phone_outlined,
+                specifiedErrorMessage: 'Invalid phone number format',
+              ),
+              AuthTextField(
+                textController: locationController,
+                hintText: 'Location',
+                icon: Icons.location_on_outlined,
+              ),
               PasswordTextField(passwordController: passwordController),
               SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) => LoginScreen(isEmployee: isEmployee),
-                      ),
-                    );
-                  },
+                  onPressed: () => register(context, role),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.yellow,
                     shape: RoundedRectangleBorder(
@@ -86,10 +160,7 @@ class SignUpScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => LoginScreen(isEmployee: isEmployee),
-                        ),
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
                       );
                     },
                     child: Text(
