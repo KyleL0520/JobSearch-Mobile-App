@@ -77,4 +77,5 @@ class DefaultFirebaseOptions {
     authDomain: 'jobsearch-51159.firebaseapp.com',
     storageBucket: 'jobsearch-51159.firebasestorage.app',
   );
+
 }

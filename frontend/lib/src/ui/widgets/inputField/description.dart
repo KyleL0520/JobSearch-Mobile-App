@@ -7,6 +7,7 @@ class DescriptionTextField extends StatefulWidget {
   final String title;
   final String? regex;
   final String hintText;
+  final int maxLength;
   final String specifiedErrorMessage;
 
   const DescriptionTextField({
@@ -16,6 +17,7 @@ class DescriptionTextField extends StatefulWidget {
     required this.hintText,
     required this.title,
     required this.specifiedErrorMessage,
+    required this.maxLength,
   });
 
   @override
@@ -42,7 +44,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField> {
         const SizedBox(height: 10),
         TextField(
           controller: widget.textController,
-          maxLength: 600,
+          maxLength: widget.maxLength,
           maxLines: 9,
           minLines: 9,
           style: TextStyle(color: AppColors.white, fontSize: 14),

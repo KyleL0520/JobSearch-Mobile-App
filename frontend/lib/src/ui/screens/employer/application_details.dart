@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
@@ -6,7 +8,10 @@ import 'package:frontend/src/ui/widgets/button/yellowButton.dart';
 import 'package:frontend/src/ui/widgets/title/form_title.dart';
 
 class ApplicationDetailsScreen extends StatelessWidget {
-  const ApplicationDetailsScreen({super.key});
+  final Map<String, dynamic> appliedJob;
+  const ApplicationDetailsScreen({super.key, required this.appliedJob});
+
+  void temp() {}
 
   @override
   Widget build(BuildContext context) {
@@ -19,63 +24,74 @@ class ApplicationDetailsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: Image.asset(
-                      'assets/images/userAvatar.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ],
+              Center(
+                child: ClipOval(
+                  child:
+                      appliedJob['avatar'].startsWith('assets/')
+                          ? Image.asset(
+                            appliedJob['avatar'],
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                          )
+                          : Image.file(
+                            File(appliedJob['avatar']),
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                          ),
+                ),
               ),
               const SizedBox(height: 30),
-              Row(
-                children: [
-                  Icon(Icons.location_on_outlined, color: AppColors.white),
-                  const SizedBox(width: 10),
-                  Text('Kuala Lumpur'),
-                ],
-              ),
               const SizedBox(height: 10),
               Row(
                 children: [
                   Image.asset('assets/icons/job.png', width: 18, height: 18),
                   const SizedBox(width: 15),
-                  Text('Full Stack Web Developer'),
+                  Text(appliedJob['profile']['title']),
                 ],
               ),
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(Icons.local_phone_outlined, color: AppColors.white),
+                  Icon(Icons.email_outlined, color: AppColors.white),
                   const SizedBox(width: 10),
-                  Text('+60 01125554123'),
+                  Text(appliedJob['email']),
                 ],
               ),
               const SizedBox(height: 30),
               CustomFormTitle(title: 'Career History'),
               const SizedBox(height: 10),
-              _three_line_card(
-                'Full-Stack developer',
-                'Lazada Company',
-                'March 2023 - March 2024',
-              ),
-              _three_line_card(
-                'Backend developer',
-                'Ant Company',
-                'April 2022 - February 2023',
+              Column(
+                children:
+                    appliedJob['profile']['careerHistorys']
+                        .map<Widget>(
+                          (career) => _three_line_card(
+                            career['company'],
+                            career['jobTitle'],
+                            career['stillInThisRole'] == true
+                                ? '${career['startDate']} - Still in this role'
+                                : '${career['startDate']} - ${career['endDate']}',
+                          ),
+                        )
+                        .toList(),
               ),
               const SizedBox(height: 20),
               CustomFormTitle(title: 'Education'),
               const SizedBox(height: 10),
-              _three_line_card(
-                'Bachelor of Software Engineering',
-                'Tunku Abdul Rahman College',
-                'Finsihed in Jan 2022',
+              Column(
+                children:
+                    appliedJob['profile']['educations']
+                        .map<Widget>(
+                          (education) => _three_line_card(
+                            education['courseOfQualification'],
+                            education['institution'],
+                            education['isComplete'] == true
+                                ? 'Finished in ${education['finishDate']}'
+                                : 'Currently Studying',
+                          ),
+                        )
+                        .toList(),
               ),
               const SizedBox(height: 20),
               CustomFormTitle(title: 'Skills'),
@@ -83,13 +99,10 @@ class ApplicationDetailsScreen extends StatelessWidget {
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
-                children: [
-                  _pointCard('NestJs'),
-                  _pointCard('MongoDB'),
-                  _pointCard('Typescript'),
-                  _pointCard('React'),
-                  _pointCard('NextJs'),
-                ],
+                children:
+                    appliedJob['profile']['skills']
+                        .map<Widget>((skill) => _pointCard(skill['label']))
+                        .toList(),
               ),
               const SizedBox(height: 20),
               CustomFormTitle(title: 'Languages'),
@@ -97,26 +110,19 @@ class ApplicationDetailsScreen extends StatelessWidget {
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
-                children: [
-                  _pointCard('English'),
-                  _pointCard('Chinese - Mandarin'),
-                  _pointCard('Melayu'),
-                ],
+                children:
+                    appliedJob['profile']['languages']
+                        .map<Widget>(
+                          (language) => _pointCard(language['label']),
+                        )
+                        .toList(),
               ),
-              const SizedBox(height: 20),
-              CustomFormTitle(title: 'Resume'),
-              const SizedBox(height: 10),
-              Row(children: [_fileCard('Resume.pdf')]),
-              const SizedBox(height: 20),
-              CustomFormTitle(title: 'Cover Letter'),
-              const SizedBox(height: 10),
-              Row(children: [_fileCard('CoverLetter.pdf')]),
               const SizedBox(height: 30),
               Row(
                 children: [
-                  RedButton(text: 'Reject'),
+                  RedButton(text: 'Reject', function: temp),
                   SizedBox(width: 10),
-                  YellowButton(text: 'Accept'),
+                  YellowButton(text: 'Accept', function: temp),
                 ],
               ),
               const SizedBox(height: 20),
@@ -173,29 +179,6 @@ class ApplicationDetailsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(name, style: TextStyle(fontSize: 15, color: AppColors.black)),
-    );
-  }
-
-  Widget _fileCard(String name) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(
-          color: AppColors.grey,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.document_scanner_outlined,
-              color: AppColors.black,
-              size: 35,
-            ),
-            SizedBox(width: 10),
-            Text(name, style: TextStyle(fontSize: 15, color: AppColors.black)),
-          ],
-        ),
-      ),
     );
   }
 }

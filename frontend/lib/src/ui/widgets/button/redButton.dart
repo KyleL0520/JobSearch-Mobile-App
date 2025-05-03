@@ -3,13 +3,14 @@ import 'package:frontend/src/styles/app_colors.dart';
 
 class RedButton extends StatelessWidget {
   final String text;
-  const RedButton({super.key, required this.text});
+  final VoidCallback function;
+  const RedButton({super.key, required this.text, required this.function});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: function,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.darkRed,
           padding: EdgeInsets.symmetric(vertical: 11),

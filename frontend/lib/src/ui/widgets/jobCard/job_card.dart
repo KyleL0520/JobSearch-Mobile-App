@@ -49,7 +49,7 @@ class _JobCardState extends State<JobCard> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EmployerJobDetailsScreen(isView: true),
+            builder: (context) => EmployerJobDetailsScreen(),
           ),
         );
       },
@@ -64,7 +64,7 @@ class _JobCardState extends State<JobCard> {
               SizedBox(
                 width: 55,
                 height: 55,
-                child: Image.asset(job!.logoPath, fit: BoxFit.cover)
+                child: Image.asset(job.logoPath, fit: BoxFit.cover),
               ),
               SizedBox(width: 12),
               Expanded(

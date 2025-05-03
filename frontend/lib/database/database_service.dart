@@ -1,38 +1,60 @@
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseService {
-  final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> create({
-    required String path,
-    required String data,
+    required String collectionPath,
+    required String docId,
+    required Map<String, dynamic> data,
   }) async {
-    final DatabaseReference ref = _firebaseDatabase.ref().child(path);
+    final DocumentReference ref = _firestore
+        .collection(collectionPath)
+        .doc(docId);
     await ref.set(data);
   }
 
-  Future<DataSnapshot?> read({
-    required String path
+  Future<DocumentSnapshot?> read({
+    required String collectionPath,
+    required String docId,
   }) async {
-    final DatabaseReference ref = _firebaseDatabase.ref().child(path);
-    final DataSnapshot snapshot = await ref.get();
+    final DocumentReference ref = _firestore
+        .collection(collectionPath)
+        .doc(docId);
+    final DocumentSnapshot snapshot = await ref.get();
     return snapshot.exists ? snapshot : null;
   }
 
   Future<void> update({
-    required String path,
+    required String collectionPath,
+    required String docId,
     required Map<String, dynamic> data,
   }) async {
-    final DatabaseReference ref = _firebaseDatabase.ref().child(path);
+    final DocumentReference ref = _firestore
+        .collection(collectionPath)
+        .doc(docId);
     await ref.update(data);
   }
 
-  Future<void> delete({
-    required String path,
+  Future<void> set({
+    required String collectionPath,
+    required String docId,
+    required Map<String, dynamic> data,
+    bool merge = true,
   }) async {
-    final DatabaseReference ref = _firebaseDatabase.ref().child(path);
-    await ref.remove();
+    final DocumentReference ref = _firestore
+        .collection(collectionPath)
+        .doc(docId);
+    await ref.set(data, SetOptions(merge: merge));
   }
 
+  Future<void> delete({
+    required String collectionPath,
+    required String docId,
+  }) async {
+    final DocumentReference ref = _firestore
+        .collection(collectionPath)
+        .doc(docId);
+    await ref.delete();
+  }
 }
-//

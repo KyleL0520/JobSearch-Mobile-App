@@ -18,14 +18,21 @@ class JobCardApplied extends StatefulWidget {
 }
 
 class _JobCardAppliedState extends State<JobCardApplied> {
-  
   @override
   Widget build(BuildContext context) {
     final job = Provider.of<JobProvider>(context).job;
 
+    void temp() {}
+
     return GestureDetector(
       onTap: () {
-        PopupForm.show(context, widget.formTitle, false, widget.child);
+        PopupForm.show(
+          context: context,
+          title: widget.formTitle,
+          btnSubmit: false,
+          child: widget.child,
+          function: temp,
+        );
       },
       child: Card(
         margin: EdgeInsets.symmetric(horizontal: 3, vertical: 6),
