@@ -405,12 +405,14 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
                                                 const SizedBox(height: 30),
                                                 Row(
                                                   children: [
-                                                    RedButton(
-                                                      text: 'Delete',
-                                                      function:
-                                                          () => removeApplication(
-                                                            appliedJob['job']['jobId'],
-                                                          ),
+                                                    Expanded(
+                                                      child: RedButton(
+                                                        text: 'Delete',
+                                                        function:
+                                                            () => removeApplication(
+                                                              appliedJob['job']['jobId'],
+                                                            ),
+                                                      ),
                                                     ),
                                                   ],
                                                 ),

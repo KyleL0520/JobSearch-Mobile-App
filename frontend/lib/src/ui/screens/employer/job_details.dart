@@ -503,7 +503,7 @@ class _EmployerJobDetailsScreenState extends State<EmployerJobDetailsScreen> {
                     ? SizedBox()
                     : Row(
                       children: [
-                        RedButton(text: 'Delete', function: removeJob),
+                        Expanded(child: RedButton(text: 'Delete', function: removeJob)),
                       ],
                     ),
                 const SizedBox(height: 20),

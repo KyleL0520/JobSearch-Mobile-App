@@ -8,19 +8,20 @@ class RedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ElevatedButton(
-        onPressed: function,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.darkRed,
-          padding: EdgeInsets.symmetric(vertical: 11),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+    return ElevatedButton(
+      onPressed: function,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.darkRed,
+        padding: const EdgeInsets.symmetric(vertical: 11),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: Text(
-          text,
-          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: AppColors.white,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );

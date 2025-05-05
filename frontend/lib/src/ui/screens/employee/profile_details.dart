@@ -889,12 +889,14 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                     const SizedBox(height: 20),
                                     Row(
                                       children: [
-                                        RedButton(
-                                          text: 'Delete',
-                                          function:
-                                              () => removeCareerHistory(
-                                                careerHistory['careerHistoryId'],
-                                              ),
+                                        Expanded(
+                                          child: RedButton(
+                                            text: 'Delete',
+                                            function:
+                                                () => removeCareerHistory(
+                                                  careerHistory['careerHistoryId'],
+                                                ),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -1106,12 +1108,14 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                     const SizedBox(height: 20),
                                     Row(
                                       children: [
-                                        RedButton(
-                                          text: 'Delete',
-                                          function:
-                                              () => removeEducation(
-                                                education['educationId'],
-                                              ),
+                                        Expanded(
+                                          child: RedButton(
+                                            text: 'Delete',
+                                            function:
+                                                () => removeEducation(
+                                                  education['educationId'],
+                                                ),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -1279,7 +1283,12 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                     ? SizedBox()
                     : Row(
                       children: [
-                        RedButton(text: 'Delete', function: removeProfile),
+                        Expanded(
+                          child: RedButton(
+                            text: 'Delete',
+                            function: removeProfile,
+                          ),
+                        ),
                       ],
                     ),
                 const SizedBox(height: 20),

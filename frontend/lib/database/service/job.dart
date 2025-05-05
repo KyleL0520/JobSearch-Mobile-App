@@ -5,7 +5,6 @@ import 'package:uuid/uuid.dart';
 
 class JobService extends DatabaseService {
   final String _uid = FirebaseAuth.instance.currentUser!.uid;
-  final DatabaseService _dbService = DatabaseService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> createJob({
@@ -33,11 +32,7 @@ class JobService extends DatabaseService {
       'company': FirebaseAuth.instance.currentUser!.displayName,
     };
 
-    await _dbService.create(
-      collectionPath: collectionPath,
-      docId: jobId,
-      data: data,
-    );
+    await create(collectionPath: collectionPath, docId: jobId, data: data);
   }
 
   Future<List<Map<String, dynamic>>> readAllJob() async {
@@ -57,7 +52,7 @@ class JobService extends DatabaseService {
 
     final List<Map<String, dynamic>> jobs =
         snapshot.docs.map((doc) {
-          return {'jobId': doc.id, ...doc.data() as Map<String, dynamic>};
+          return {...doc.data() as Map<String, dynamic>};
         }).toList();
 
     return jobs;
@@ -65,13 +60,9 @@ class JobService extends DatabaseService {
 
   Future<void> updateJob(String jobId, Map<String, dynamic> data) async {
     final String collectionPath = 'Employer/$_uid/Job';
-    await _dbService.set(
-      collectionPath: collectionPath,
-      docId: jobId,
-      data: data,
-    );
+    await set(collectionPath: collectionPath, docId: jobId, data: data);
 
-    await _dbService.set(
+    await set(
       collectionPath: 'Employer/$_uid/JobApplied',
       docId: jobId,
       data: data,
@@ -81,18 +72,18 @@ class JobService extends DatabaseService {
 
     for (var emp in employees.docs) {
       final employeeId = emp.id;
-      final savedJobDoc = await _dbService.read(
+      final savedJobDoc = await read(
         collectionPath: 'Employee/$employeeId/SavedJob',
         docId: jobId,
       );
 
-      final appliedJobDoc = await _dbService.read(
+      final appliedJobDoc = await read(
         collectionPath: 'Employee/$employeeId/JobApplied',
         docId: jobId,
       );
 
       if (savedJobDoc != null) {
-        await _dbService.set(
+        await set(
           collectionPath: 'Employee/$employeeId/SavedJob',
           docId: jobId,
           data: data,
@@ -100,7 +91,7 @@ class JobService extends DatabaseService {
       }
 
       if (appliedJobDoc != null) {
-        await _dbService.set(
+        await set(
           collectionPath: 'Employee/$employeeId/JobApplied',
           docId: jobId,
           data: data,
@@ -124,13 +115,13 @@ class JobService extends DatabaseService {
       'avatar': avatar,
     };
 
-    await _dbService.create(
+    await create(
       collectionPath: 'Employer/$employerId/JobApplied',
       docId: job['jobId'],
       data: data,
     );
 
-    await _dbService.create(
+    await create(
       collectionPath: 'Employee/$_uid/JobApplied',
       docId: job['jobId'],
       data: data,
@@ -140,11 +131,7 @@ class JobService extends DatabaseService {
   Future<void> saveJob(Map<String, dynamic> job) async {
     final String collectionPath = 'Employee/$_uid/SavedJob';
     final String jobId = job['jobId'];
-    await _dbService.create(
-      collectionPath: collectionPath,
-      docId: jobId,
-      data: job,
-    );
+    await create(collectionPath: collectionPath, docId: jobId, data: job);
   }
 
   Future<List<Map<String, dynamic>>> readSavedJob() async {
@@ -182,26 +169,23 @@ class JobService extends DatabaseService {
 
   Future<void> deleteSavedJob(String jobId) async {
     final String collectionPath = 'Employee/$_uid/SavedJob';
-    await _dbService.delete(collectionPath: collectionPath, docId: jobId);
+    await delete(collectionPath: collectionPath, docId: jobId);
   }
 
   Future<void> deleteAppliedJob(String jobId) async {
-    await _dbService.delete(
-      collectionPath: 'Employee/$_uid/JobApplied',
-      docId: jobId,
-    );
+    await delete(collectionPath: 'Employee/$_uid/JobApplied', docId: jobId);
 
     final employers = await _firestore.collection('Employer').get();
 
     for (var emp in employers.docs) {
       final employerId = emp.id;
-      final appliedJobDoc = await _dbService.read(
+      final appliedJobDoc = await read(
         collectionPath: 'Employer/$employerId/JobApplied',
         docId: jobId,
       );
 
       if (appliedJobDoc != null) {
-        await _dbService.delete(
+        await delete(
           collectionPath: 'Employer/$employerId/JobApplied',
           docId: jobId,
         );
@@ -211,31 +195,31 @@ class JobService extends DatabaseService {
 
   Future<void> deleteJob(String jobId) async {
     final String collectionPath = 'Employer/$_uid/Job';
-    await _dbService.delete(collectionPath: collectionPath, docId: jobId);
+    await delete(collectionPath: collectionPath, docId: jobId);
 
     final employees = await _firestore.collection('Employee').get();
 
     for (var emp in employees.docs) {
       final employeeId = emp.id;
-      final savedJobDoc = await _dbService.read(
+      final savedJobDoc = await read(
         collectionPath: 'Employee/$employeeId/SavedJob',
         docId: jobId,
       );
 
-      final appliedJobDoc = await _dbService.read(
+      final appliedJobDoc = await read(
         collectionPath: 'Employee/$employeeId/JobApplied',
         docId: jobId,
       );
 
       if (savedJobDoc != null) {
-        await _dbService.delete(
+        await delete(
           collectionPath: 'Employee/$employeeId/SavedJob',
           docId: jobId,
         );
       }
 
       if (appliedJobDoc != null) {
-        await _dbService.delete(
+        await delete(
           collectionPath: 'Employee/$employeeId/JobApplied',
           docId: jobId,
         );
@@ -246,13 +230,13 @@ class JobService extends DatabaseService {
 
     for (var empr in employers.docs) {
       final employerId = empr.id;
-      final appliedJobDoc = await _dbService.read(
+      final appliedJobDoc = await read(
         collectionPath: 'Employer/$employerId/JobApplied',
         docId: jobId,
       );
 
       if (appliedJobDoc != null) {
-        await _dbService.delete(
+        await delete(
           collectionPath: 'Employer/$employerId/JobApplied',
           docId: jobId,
         );

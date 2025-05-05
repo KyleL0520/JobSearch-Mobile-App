@@ -254,7 +254,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               specifiedErrorMessage: '',
             ),
             const SizedBox(height: 10),
-            YellowButton(text: 'Edit', function: updateProfile),
+            Row(
+              children: [
+                Expanded(
+                  child: YellowButton(text: 'Edit', function: updateProfile),
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
           ],
         ),

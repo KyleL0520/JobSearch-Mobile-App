@@ -1,10 +1,10 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
 import 'package:frontend/src/ui/widgets/button/redButton.dart';
 import 'package:frontend/src/ui/widgets/button/yellowButton.dart';
+import 'package:frontend/src/ui/widgets/card.dart';
 import 'package:frontend/src/ui/widgets/title/form_title.dart';
 
 class ApplicationDetailsScreen extends StatelessWidget {
@@ -43,7 +43,6 @@ class ApplicationDetailsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 30),
-              const SizedBox(height: 10),
               Row(
                 children: [
                   Image.asset('assets/icons/job.png', width: 18, height: 18),
@@ -54,64 +53,74 @@ class ApplicationDetailsScreen extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(Icons.email_outlined, color: AppColors.white),
+                  const Icon(Icons.email_outlined, color: AppColors.white),
                   const SizedBox(width: 10),
                   Text(appliedJob['email']),
                 ],
               ),
               const SizedBox(height: 30),
-              CustomFormTitle(title: 'Career History'),
+              const CustomFormTitle(title: 'Career History'),
               const SizedBox(height: 10),
               Column(
                 children:
-                    appliedJob['profile']['careerHistorys']
+                    (appliedJob['profile']['careerHistorys'] as List)
                         .map<Widget>(
-                          (career) => _three_line_card(
-                            career['company'],
-                            career['jobTitle'],
-                            career['stillInThisRole'] == true
-                                ? '${career['startDate']} - Still in this role'
-                                : '${career['startDate']} - ${career['endDate']}',
+                          (career) => Row(
+                            children: [
+                              CardWidget(
+                                first: career['company'],
+                                second: career['jobTitle'],
+                                third:
+                                    career['stillInThisRole'] == true
+                                        ? '${career['startDate']} - Still in this role'
+                                        : '${career['startDate']} - ${career['endDate']}',
+                              ),
+                            ],
                           ),
                         )
                         .toList(),
               ),
               const SizedBox(height: 20),
-              CustomFormTitle(title: 'Education'),
+              const CustomFormTitle(title: 'Education'),
               const SizedBox(height: 10),
               Column(
                 children:
-                    appliedJob['profile']['educations']
+                    (appliedJob['profile']['educations'] as List)
                         .map<Widget>(
-                          (education) => _three_line_card(
-                            education['courseOfQualification'],
-                            education['institution'],
-                            education['isComplete'] == true
-                                ? 'Finished in ${education['finishDate']}'
-                                : 'Currently Studying',
+                          (education) => Row(
+                            children: [
+                              CardWidget(
+                                first: education['courseOfQualification'],
+                                second: education['institution'],
+                                third:
+                                    education['isComplete'] == true
+                                        ? 'Finished in ${education['finishDate']}'
+                                        : 'Currently Studying',
+                              ),
+                            ],
                           ),
                         )
                         .toList(),
               ),
               const SizedBox(height: 20),
-              CustomFormTitle(title: 'Skills'),
+              const CustomFormTitle(title: 'Skills'),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
                 children:
-                    appliedJob['profile']['skills']
+                    (appliedJob['profile']['skills'] as List)
                         .map<Widget>((skill) => _pointCard(skill['label']))
                         .toList(),
               ),
               const SizedBox(height: 20),
-              CustomFormTitle(title: 'Languages'),
+              const CustomFormTitle(title: 'Languages'),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
                 children:
-                    appliedJob['profile']['languages']
+                    (appliedJob['profile']['languages'] as List)
                         .map<Widget>(
                           (language) => _pointCard(language['label']),
                         )
@@ -120,9 +129,9 @@ class ApplicationDetailsScreen extends StatelessWidget {
               const SizedBox(height: 30),
               Row(
                 children: [
-                  RedButton(text: 'Reject', function: temp),
-                  SizedBox(width: 10),
-                  YellowButton(text: 'Accept', function: temp),
+                  Expanded(child: RedButton(text: 'Reject', function: temp)),
+                  const SizedBox(width: 10),
+                  Expanded(child: YellowButton(text: 'Accept', function: temp)),
                 ],
               ),
               const SizedBox(height: 20),
@@ -133,52 +142,17 @@ class ApplicationDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _three_line_card(String title, String venue, String date) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 3, vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: AppColors.grey,
-      child: Padding(
-        padding: EdgeInsets.all(12),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: AppColors.black,
-                    ),
-                  ),
-                  Text(
-                    venue,
-                    style: TextStyle(fontSize: 13, color: AppColors.black),
-                  ),
-                  Text(
-                    date,
-                    style: TextStyle(fontSize: 13, color: AppColors.black),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _pointCard(String name) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.grey,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(name, style: TextStyle(fontSize: 15, color: AppColors.black)),
+      child: Text(
+        name,
+        style: const TextStyle(fontSize: 15, color: AppColors.black),
+      ),
     );
   }
 }

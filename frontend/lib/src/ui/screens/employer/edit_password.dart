@@ -63,7 +63,7 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
       );
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.successSnackBar(title: 'Password changed successfully!')
+        CustomSnackBar.successSnackBar(title: 'Password changed successfully!'),
       );
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
@@ -78,13 +78,13 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
       }
 
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.failedSnackBar(title: errorMessage)
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(CustomSnackBar.failedSnackBar(title: errorMessage));
     } catch (e) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.failedSnackBar(title: 'An unexpected error occurred')
+        CustomSnackBar.failedSnackBar(title: 'An unexpected error occurred'),
       );
     }
   }
@@ -187,7 +187,16 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
                 ],
               ),
               const SizedBox(height: 10),
-              YellowButton(text: 'Change Password', function: updatePassword),
+              Row(
+                children: [
+                  Expanded(
+                    child: YellowButton(
+                      text: 'Change Password',
+                      function: updatePassword,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
             ],
           ),
