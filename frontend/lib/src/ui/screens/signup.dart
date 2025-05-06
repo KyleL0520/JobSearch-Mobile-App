@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:frontend/database/auth/auth_service.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/screens/login.dart';
+import 'package:frontend/src/ui/screens/verify_email.dart';
 import 'package:frontend/src/ui/widgets/inputField/auth_text_field.dart';
 import 'package:frontend/src/ui/widgets/inputField/password.dart';
 import 'package:frontend/src/ui/widgets/inputField/role_selection.dart';
+import 'package:frontend/src/ui/widgets/snackbar/snack_bar.dart';
 import 'package:frontend/src/ui/widgets/title/title.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -69,32 +71,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
         role: selectedRole,
       );
 
+      final user = FirebaseAuth.instance.currentUser;
+      try {
+        await user?.sendEmailVerification();
+      } catch (e) {
+        debugPrint('Email verification failed: $e');
+      }
+
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Sign up successfully!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
+        CustomSnackBar.successSnackBar(title: 'Sign up successfully!'),
       );
 
       await Future.delayed(Duration(seconds: 2));
 
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => const VerifyEmailScreen()),
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message ?? 'There is an error in sign up page';
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: AppColors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
     }
   }
 

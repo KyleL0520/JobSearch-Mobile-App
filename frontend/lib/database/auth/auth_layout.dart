@@ -5,22 +5,21 @@ import 'package:frontend/database/auth/auth_service.dart';
 import 'package:frontend/src/ui/screens/employee/main_screen.dart';
 import 'package:frontend/src/ui/screens/employer/main_screen.dart';
 import 'package:frontend/src/ui/screens/login.dart';
+import 'package:frontend/src/ui/screens/verify_email.dart';
 import 'package:frontend/src/ui/widgets/app_loading.dart';
 
 class AuthLayout extends StatelessWidget {
-  const AuthLayout({super.key});
+  AuthLayout({super.key});
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<String?> _getUserRole() async {
-    try {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      final userDoc =
-          await FirebaseFirestore.instance.collection('User').doc(uid).get();
+  Future<String> _getCurrentUserRole(String uid) async {
+    final DocumentSnapshot employeeDoc =
+        await _firestore.collection('Employee').doc(uid).get();
 
-      return userDoc['role'] as String?;
-    } catch (e) {
-      debugPrint('Error fetching user role: $e');
-      return null;
+    if (employeeDoc.exists) {
+      return 'employee';
     }
+    return 'employer';
   }
 
   @override
@@ -28,16 +27,22 @@ class AuthLayout extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: authService,
       builder: (context, authService, child) {
-        return StreamBuilder(
+        return StreamBuilder<User?>(
           stream: authService.authStateChanges,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const AppLoading();
             }
 
-            if (snapshot.hasData) {
+            final user = snapshot.data;
+
+            if (user != null) {
+              if (!user.emailVerified) {
+                return const VerifyEmailScreen();
+              }
+
               return FutureBuilder<String?>(
-                future: _getUserRole(),
+                future: _getCurrentUserRole(user.uid),
                 builder: (context, roleSnapshot) {
                   if (roleSnapshot.connectionState == ConnectionState.waiting) {
                     return const AppLoading();

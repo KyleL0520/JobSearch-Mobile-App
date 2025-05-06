@@ -97,7 +97,7 @@ class _ThreadScreenState extends State<ThreadScreen> {
     }
 
     return null;
-  }
+  } 
 
   void editThread() async {
     final String currentComment = commentController.text.trim();

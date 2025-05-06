@@ -5,6 +5,7 @@ import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/screens/login.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
 import 'package:frontend/src/ui/widgets/inputField/auth_text_field.dart';
+import 'package:frontend/src/ui/widgets/snackbar/snack_bar.dart';
 import 'package:frontend/src/ui/widgets/title/title.dart';
 
 class FrogotPasswordScreen extends StatefulWidget {
@@ -28,28 +29,22 @@ class _FrogotPasswordScreenState extends State<FrogotPasswordScreen> {
 
   void resetPassword() async {
     try {
-      await authService.value.resetPassword(email: emailController.text);
+      await authService.value.resetPassword(email: emailController.text.trim());
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Email send successfully!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
+        CustomSnackBar.successSnackBar(
+          title: 'Password reset link sent successfully! Check your email',
         ),
       );
       setState(() {
         errorMessage = '';
       });
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = 'Email not exist';
-      });
+      print(e);
 
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: AppColors.red,
-          duration: Duration(seconds: 3),
-        ),
+        CustomSnackBar.failedSnackBar(title: e.message.toString()),
       );
     }
   }
@@ -90,6 +85,7 @@ class _FrogotPasswordScreenState extends State<FrogotPasswordScreen> {
                 height: 55,
                 child: ElevatedButton(
                   onPressed: () {
+                    resetPassword();
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => LoginScreen()),

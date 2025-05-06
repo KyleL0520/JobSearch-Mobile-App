@@ -7,8 +7,10 @@ import 'package:frontend/src/ui/screens/employee/main_screen.dart';
 import 'package:frontend/src/ui/screens/employer/main_screen.dart';
 import 'package:frontend/src/ui/screens/forgot_password.dart';
 import 'package:frontend/src/ui/screens/signup.dart';
+import 'package:frontend/src/ui/screens/verify_email.dart';
 import 'package:frontend/src/ui/widgets/inputField/auth_text_field.dart';
 import 'package:frontend/src/ui/widgets/inputField/password.dart';
+import 'package:frontend/src/ui/widgets/snackbar/snack_bar.dart';
 import 'package:frontend/src/ui/widgets/title/title.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -42,7 +44,28 @@ class _LoginScreenState extends State<LoginScreen> {
         password: passwordController.text,
       );
 
-      final uid = FirebaseAuth.instance.currentUser!.uid;
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user != null && !user.emailVerified) {
+        await authService.value.signOut();
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar.failedSnackBar(
+            title: "Please verify your email before logging in.",
+          ),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const VerifyEmailScreen()),
+        );
+        return;
+      }
+
+      final uid = user!.uid;
 
       final employeeDoc =
           await FirebaseFirestore.instance
@@ -65,13 +88,10 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Login successfully!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(CustomSnackBar.successSnackBar(title: 'Login successful'));
 
       Navigator.push(
         context,
@@ -85,16 +105,13 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
-        errorMessage = 'Account not exist';
+        errorMessage = 'Invalid email or password';
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: AppColors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(CustomSnackBar.failedSnackBar(title: errorMessage));
     }
   }
 
