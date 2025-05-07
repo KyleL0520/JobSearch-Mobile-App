@@ -95,6 +95,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
           children: [
             SizedBox(height: 20),
             TextField(
+              style: TextStyle(color: AppColors.black),
               controller: searchController,
               onChanged: filterJobs,
               decoration: InputDecoration(
@@ -102,7 +103,11 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                   horizontal: 20,
                   vertical: 7,
                 ),
-                suffixIcon: Icon(Icons.search, color: AppColors.black),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.search),
+                  color: AppColors.black,
+                  onPressed: () => filteredJobs,
+                ),
                 hintText: 'Search',
                 hintStyle: TextStyle(color: AppColors.black),
                 filled: true,
@@ -141,11 +146,10 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                       ),
                     );
                   } else {
-                    final jobs = snapshot.data!;
                     return ListView.builder(
-                      itemCount: jobs.length,
+                      itemCount: filteredJobs.length,
                       itemBuilder: (context, index) {
-                        final job = jobs[index];
+                        final job = filteredJobs[index];
                         return Expanded(
                           child: FutureBuilder<bool>(
                             future: isJobSaved(job['jobId']),
