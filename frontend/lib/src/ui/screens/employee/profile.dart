@@ -4,12 +4,13 @@ import 'package:frontend/database/auth/auth_service.dart';
 import 'package:frontend/database/database_service.dart';
 import 'package:frontend/database/service/profile.dart';
 import 'package:frontend/src/styles/app_colors.dart';
+import 'package:frontend/src/ui/screens/edit_password.dart';
 import 'package:frontend/src/ui/screens/employee/profile_details.dart';
 import 'package:frontend/src/ui/screens/employee/edit_profile.dart';
 import 'package:frontend/src/ui/screens/login.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
 
-enum Menu { profileDetails, logout }
+enum Menu { profileDetails, editPassword, logout }
 
 class EmployeeProfileScreen extends StatefulWidget {
   const EmployeeProfileScreen({super.key});
@@ -63,6 +64,15 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                   );
                   break;
 
+                case Menu.editPassword:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditPasswordScreen(uid: uid),
+                    ),
+                  );
+                  break;
+
                 case Menu.logout:
                   () async {
                     await authService.value.signOut();
@@ -80,6 +90,13 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                   value: Menu.profileDetails,
                   child: Text(
                     'Profile Details',
+                    style: TextStyle(color: AppColors.white),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: Menu.editPassword,
+                  child: Text(
+                    'Edit Password',
                     style: TextStyle(color: AppColors.white),
                   ),
                 ),

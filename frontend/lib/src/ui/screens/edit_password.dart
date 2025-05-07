@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/database/auth/auth_service.dart';
+import 'package:frontend/database/database_service.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
 import 'package:frontend/src/ui/widgets/button/yellowButton.dart';
@@ -8,16 +12,21 @@ import 'package:frontend/src/ui/widgets/snackbar/snack_bar.dart';
 import 'package:frontend/src/ui/widgets/title/form_title.dart';
 
 class EditPasswordScreen extends StatefulWidget {
-  const EditPasswordScreen({super.key});
+  final String uid;
+  const EditPasswordScreen({super.key, required this.uid});
 
   @override
   State<EditPasswordScreen> createState() => _EditPasswordScreenState();
 }
 
 class _EditPasswordScreenState extends State<EditPasswordScreen> {
+  final String uid = FirebaseAuth.instance.currentUser!.uid;
   final TextEditingController currentPasswordContorller =
       TextEditingController();
   final TextEditingController newPasswordContorller = TextEditingController();
+  final db = DatabaseService();
+  bool _isObscure1 = true;
+  bool _isObscure2 = true;
 
   String? _currentPasswordErrorText = '';
   String? _newPasswordErrorText = '';
@@ -29,6 +38,48 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
     super.dispose();
     currentPasswordContorller.dispose();
     newPasswordContorller.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAvatar(uid).then((value) {
+      setState(() {
+        _avatar = value ?? 'assets/images/userAvatar.png';
+      });
+    });
+  }
+
+  String _avatar = 'assets/images/userAvatar.png';
+
+  Future<String?> getAvatar(String uid) async {
+    final employeeDoc =
+        await FirebaseFirestore.instance.collection('Employee').doc(uid).get();
+
+    String role = '';
+    if (employeeDoc.exists) {
+      role = 'Employee';
+    } else {
+      final employerDoc =
+          await FirebaseFirestore.instance
+              .collection('Employer')
+              .doc(uid)
+              .get();
+
+      if (employerDoc.exists) {
+        role = 'Employer';
+      }
+    }
+
+    print(uid);
+    final snapshot = await db.read(collectionPath: role, docId: uid);
+
+    if (snapshot != null && snapshot.exists) {
+      final data = snapshot.data() as Map<String, dynamic>;
+      return data['avatar'] as String?;
+    }
+
+    return null;
   }
 
   void updatePassword() async {
@@ -104,8 +155,23 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              Image.asset('assets/images/shopee.jpg', width: 80, height: 80),
-              const SizedBox(height: 20),
+              ClipOval(
+                child:
+                    _avatar.startsWith('assets/')
+                        ? Image.asset(
+                          _avatar,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        )
+                        : Image.file(
+                          File(_avatar),
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+              ),
+              const SizedBox(height: 50),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -114,12 +180,23 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
                   TextField(
                     controller: currentPasswordContorller,
                     style: TextStyle(color: AppColors.white, fontSize: 14),
-                    obscureText: true,
+                    obscureText: _isObscure1,
                     decoration: InputDecoration(
                       hintText: 'Enter current password',
                       hintStyle: TextStyle(color: AppColors.grey),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isObscure1 = !_isObscure1;
+                          });
+                        },
+                        icon: Icon(
+                          _isObscure1 ? Icons.visibility_off : Icons.visibility,
+                          color: AppColors.white,
+                        ),
                       ),
                       filled: true,
                       fillColor: Colors.transparent,
@@ -127,6 +204,7 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
                         vertical: 2,
                         horizontal: 10,
                       ),
+
                       errorText: null,
                     ),
                   ),
@@ -152,7 +230,7 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
                   TextField(
                     controller: newPasswordContorller,
                     style: TextStyle(color: AppColors.white, fontSize: 14),
-                    obscureText: true,
+                    obscureText: _isObscure2,
                     decoration: InputDecoration(
                       hintText: 'Enter new password',
                       hintStyle: TextStyle(color: AppColors.grey),
@@ -164,6 +242,17 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 2,
                         horizontal: 10,
+                      ),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isObscure2 = !_isObscure2;
+                          });
+                        },
+                        icon: Icon(
+                          _isObscure2 ? Icons.visibility_off : Icons.visibility,
+                          color: AppColors.white,
+                        ),
                       ),
                       errorText: null,
                     ),

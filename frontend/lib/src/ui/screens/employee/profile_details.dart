@@ -671,7 +671,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                   regex: twentyFourPattern,
                   hintText: 'Enter title',
                   title: 'Title',
-                  specifiedErrorMessage: 'No more than 24 words',
+                  specifiedErrorMessage: 'No more than 24 words and symbol',
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -699,7 +699,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                     title: 'Job title',
                                     regex: twentyFourPattern,
                                     specifiedErrorMessage:
-                                        'No more than 24 words',
+                                        'No more than 24 words and symbol',
                                   ),
                                   const SizedBox(height: 10),
                                   StringTextField(
@@ -708,7 +708,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                     title: 'Company',
                                     regex: twentyFourPattern,
                                     specifiedErrorMessage:
-                                        'No more than 24 words',
+                                        'No more than 24 words and symbol',
                                   ),
                                   const SizedBox(height: 10),
                                   DatePickerField(
@@ -820,7 +820,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                       title: 'Job title',
                                       regex: twentyFourPattern,
                                       specifiedErrorMessage:
-                                          'No more than 24 words',
+                                          'No more than 24 words and symbol',
                                     ),
                                     const SizedBox(height: 10),
                                     StringTextField(
@@ -829,7 +829,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                       title: 'Company',
                                       regex: twentyFourPattern,
                                       specifiedErrorMessage:
-                                          'No more than 24 words',
+                                          'No more than 24 words and symbol',
                                     ),
                                     const SizedBox(height: 10),
                                     DatePickerField(

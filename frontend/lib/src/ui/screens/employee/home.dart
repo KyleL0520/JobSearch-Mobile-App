@@ -18,6 +18,10 @@ class EmployeeHomeScreen extends StatefulWidget {
 class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
   late Future<List<Map<String, dynamic>>> jobsFuture;
 
+  TextEditingController searchController = TextEditingController();
+  List<Map<String, dynamic>> allJobs = [];
+  List<Map<String, dynamic>> filteredJobs = [];
+
   final String _uid = FirebaseAuth.instance.currentUser!.uid;
   final jobService = JobService();
   final db = DatabaseService();
@@ -25,7 +29,11 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
   @override
   void initState() {
     super.initState();
-    jobsFuture = jobService.readAllJob();
+    jobsFuture = jobService.readAllJob().then((jobs) {
+      allJobs = jobs;
+      filteredJobs = jobs;
+      return jobs;
+    });
   }
 
   void refreshJobs() {
@@ -58,6 +66,26 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    searchController.dispose();
+  }
+
+  void filterJobs(String query) {
+    final filtered =
+        allJobs.where((job) {
+          final title = job['title'].toString().toLowerCase();
+          final location = job['location'].toString().toLowerCase();
+          final input = query.toLowerCase();
+          return title.contains(input) || location.contains(input);
+        }).toList();
+
+    setState(() {
+      filteredJobs = filtered;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'JobSearch', isCenterTitle: false),
@@ -67,6 +95,8 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
           children: [
             SizedBox(height: 20),
             TextField(
+              controller: searchController,
+              onChanged: filterJobs,
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 20,
