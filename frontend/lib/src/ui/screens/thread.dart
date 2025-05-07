@@ -97,7 +97,7 @@ class _ThreadScreenState extends State<ThreadScreen> {
     }
 
     return null;
-  } 
+  }
 
   void editThread() async {
     final String currentComment = commentController.text.trim();
@@ -410,16 +410,18 @@ class _ThreadScreenState extends State<ThreadScreen> {
                             endActionPane: ActionPane(
                               motion: const BehindMotion(),
                               children: [
-                                SlidableAction(
-                                  onPressed:
-                                      (context) => deleteReply(
-                                        reply['commentId'],
-                                        reply['threadId'],
-                                        reply['replyId'],
-                                      ),
-                                  backgroundColor: AppColors.red,
-                                  label: 'Delete',
-                                ),
+                                reply['userId'] == _uid
+                                    ? SlidableAction(
+                                      onPressed:
+                                          (context) => deleteReply(
+                                            reply['commentId'],
+                                            reply['threadId'],
+                                            reply['replyId'],
+                                          ),
+                                      backgroundColor: AppColors.red,
+                                      label: 'Delete',
+                                    )
+                                    : SizedBox(),
                               ],
                             ),
                             child: Column(

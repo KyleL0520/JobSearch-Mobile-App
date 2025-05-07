@@ -30,9 +30,9 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
 
   void temp() {}
 
-  void removeApplication(String jobId) async {
+  void removeApplication(String applicationId) async {
     try {
-      await jobService.deleteAppliedJob(jobId);
+      await jobService.deleteApplication(applicationId: applicationId);
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         CustomSnackBar.successSnackBar(title: 'Job apply deleted successfully'),
@@ -52,13 +52,13 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
   void initState() {
     super.initState();
     savedJobsFuture = jobService.readSavedJob();
-    appliedJobsFuture = jobService.readAppliedJobByEmployee();
+    appliedJobsFuture = jobService.readApplication();
   }
 
   void refreshJobs() {
     setState(() {
       savedJobsFuture = jobService.readSavedJob();
-      appliedJobsFuture = jobService.readAppliedJobByEmployee();
+      appliedJobsFuture = jobService.readApplication();
     });
   }
 
@@ -321,7 +321,7 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
                                   ),
                                   SizedBox(height: 10),
                                   Text(
-                                    'There are no saved job at the moment',
+                                    'There are no applied job at the moment',
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -410,7 +410,7 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
                                                         text: 'Delete',
                                                         function:
                                                             () => removeApplication(
-                                                              appliedJob['job']['jobId'],
+                                                              appliedJob['applicationId'],
                                                             ),
                                                       ),
                                                     ),
@@ -493,10 +493,20 @@ class _EmployeeActivityScreenState extends State<EmployeeActivityScreen> {
                                                     ],
                                                   ),
                                                 ),
-                                                Icon(
-                                                  Icons.check_circle_rounded,
-                                                  color: Colors.green,
-                                                ),
+                                                if (appliedJob['isAccept'] !=
+                                                    null)
+                                                  appliedJob['isAccept']
+                                                      ? Icon(
+                                                        Icons
+                                                            .check_circle_rounded,
+                                                        color: Colors.green,
+                                                      )
+                                                      : Text(
+                                                        'Rejected',
+                                                        style: TextStyle(
+                                                          color: AppColors.red,
+                                                        ),
+                                                      ),
                                               ],
                                             ),
                                           ),

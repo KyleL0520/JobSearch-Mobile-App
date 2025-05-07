@@ -78,11 +78,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       final user = FirebaseAuth.instance.currentUser!;
       await user.sendEmailVerification();
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(CustomSnackBar.failedSnackBar(title: e.toString()));
+      print(e.toString());
     }
   }
 

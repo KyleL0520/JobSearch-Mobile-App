@@ -4,6 +4,7 @@ import 'package:frontend/database/database_service.dart';
 import 'package:uuid/uuid.dart';
 
 class JobService extends DatabaseService {
+  final String? username = FirebaseAuth.instance.currentUser!.displayName;
   final String _uid = FirebaseAuth.instance.currentUser!.uid;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -62,23 +63,12 @@ class JobService extends DatabaseService {
     final String collectionPath = 'Employer/$_uid/Job';
     await set(collectionPath: collectionPath, docId: jobId, data: data);
 
-    await set(
-      collectionPath: 'Employer/$_uid/JobApplied',
-      docId: jobId,
-      data: data,
-    );
-
     final employees = await _firestore.collection('Employee').get();
 
     for (var emp in employees.docs) {
       final employeeId = emp.id;
       final savedJobDoc = await read(
         collectionPath: 'Employee/$employeeId/SavedJob',
-        docId: jobId,
-      );
-
-      final appliedJobDoc = await read(
-        collectionPath: 'Employee/$employeeId/JobApplied',
         docId: jobId,
       );
 
@@ -89,13 +79,20 @@ class JobService extends DatabaseService {
           data: data,
         );
       }
+    }
 
-      if (appliedJobDoc != null) {
-        await set(
-          collectionPath: 'Employee/$employeeId/JobApplied',
-          docId: jobId,
-          data: data,
-        );
+    final applications = await _firestore.collection('Application').get();
+    for (var app in applications.docs) {
+      final appData = app.data();
+      final job = appData['job'];
+
+      if (job != null && job['id'] == jobId) {
+        final updatedAppData = {...appData, 'job': data};
+
+        await _firestore
+            .collection('Application')
+            .doc(app.id)
+            .set(updatedAppData);
       }
     }
   }
@@ -105,25 +102,23 @@ class JobService extends DatabaseService {
     required Map<String, dynamic> job,
     required String avatar,
   }) async {
-    final String employerId = job['createdBy'];
+    String applicationId = 'application_${Uuid().v4()}';
 
     final Map<String, dynamic> data = {
+      'applicationId': applicationId,
       'profile': profile,
       'job': job,
-      'employee': FirebaseAuth.instance.currentUser!.displayName,
+      'employer': job['createdBy'],
+      'employee': _uid,
+      'employeeName': username,
       'email': FirebaseAuth.instance.currentUser!.email,
       'avatar': avatar,
+      'isAccept': null,
     };
 
     await create(
-      collectionPath: 'Employer/$employerId/JobApplied',
-      docId: job['jobId'],
-      data: data,
-    );
-
-    await create(
-      collectionPath: 'Employee/$_uid/JobApplied',
-      docId: job['jobId'],
+      collectionPath: 'Application',
+      docId: applicationId,
       data: data,
     );
   }
@@ -145,25 +140,13 @@ class JobService extends DatabaseService {
         .toList();
   }
 
-  Future<List<Map<String, dynamic>>> readAppliedJobByEmployee() async {
+  Future<List<Map<String, dynamic>>> readApplication() async {
     final QuerySnapshot snapshot =
-        await FirebaseFirestore.instance
-            .collection('Employee/$_uid/JobApplied')
-            .get();
+        await FirebaseFirestore.instance.collection('Application').get();
 
     return snapshot.docs
         .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList();
-  }
-
-  Future<List<Map<String, dynamic>>> readAppliedJobByEmployer() async {
-    final QuerySnapshot snapshot =
-        await FirebaseFirestore.instance
-            .collection('Employer/$_uid/JobApplied')
-            .get();
-
-    return snapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
+        .where((data) => data['employee'] == _uid || data['employer'] == _uid)
         .toList();
   }
 
@@ -172,25 +155,8 @@ class JobService extends DatabaseService {
     await delete(collectionPath: collectionPath, docId: jobId);
   }
 
-  Future<void> deleteAppliedJob(String jobId) async {
-    await delete(collectionPath: 'Employee/$_uid/JobApplied', docId: jobId);
-
-    final employers = await _firestore.collection('Employer').get();
-
-    for (var emp in employers.docs) {
-      final employerId = emp.id;
-      final appliedJobDoc = await read(
-        collectionPath: 'Employer/$employerId/JobApplied',
-        docId: jobId,
-      );
-
-      if (appliedJobDoc != null) {
-        await delete(
-          collectionPath: 'Employer/$employerId/JobApplied',
-          docId: jobId,
-        );
-      }
-    }
+  Future<void> deleteApplication({required String applicationId}) async {
+    await delete(collectionPath: 'Application', docId: applicationId);
   }
 
   Future<void> deleteJob(String jobId) async {
@@ -242,5 +208,35 @@ class JobService extends DatabaseService {
         );
       }
     }
+  }
+
+  Future<void> acceptApplication({required String applicationId}) async {
+    await set(
+      collectionPath: 'Application',
+      docId: applicationId,
+      data: {'isAccept': true, 'employer': _uid},
+    );
+  }
+
+  Future<void> rejectApplication({required String applicationId}) async {
+    await set(
+      collectionPath: 'Application',
+      docId: applicationId,
+      data: {'isAccept': false},
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> readAcceptedApplication() async {
+    final QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('Application').get();
+
+    return snapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .where(
+          (data) =>
+              (data['employee'] == _uid || data['employer'] == _uid) &&
+              data['isAccept'] == true,
+        )
+        .toList();
   }
 }

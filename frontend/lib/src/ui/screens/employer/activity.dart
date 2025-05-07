@@ -19,12 +19,12 @@ class _EmployerActivityScreenState extends State<EmployerActivityScreen> {
   @override
   void initState() {
     super.initState();
-    appliedJobsFuture = jobService.readAppliedJobByEmployer();
+    appliedJobsFuture = jobService.readApplication();
   }
 
   void refreshJobs() {
     setState(() {
-      appliedJobsFuture = jobService.readAppliedJobByEmployer();
+      appliedJobsFuture = jobService.readApplication();
     });
   }
 
@@ -69,78 +69,83 @@ class _EmployerActivityScreenState extends State<EmployerActivityScreen> {
                       itemCount: appliedJobs.length,
                       itemBuilder: (context, index) {
                         final appliedJob = appliedJobs[index];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => ApplicationDetailsScreen(
-                                      appliedJob: appliedJob,
-                                    ),
+                        if (appliedJob['isAccept'] == null) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => ApplicationDetailsScreen(
+                                        isAccepted: false,
+                                        appliedJob: appliedJob,
+                                      ),
+                                ),
+                              );
+                            },
+                            child: Card(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 3,
+                                vertical: 6,
                               ),
-                            );
-                          },
-                          child: Card(
-                            margin: EdgeInsets.symmetric(
-                              horizontal: 3,
-                              vertical: 6,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            color: AppColors.grey,
-                            child: Padding(
-                              padding: EdgeInsets.all(12),
-                              child: Row(
-                                children: [
-                                  ClipOval(
-                                    child:
-                                        appliedJob['avatar'].startsWith(
-                                              'assets/',
-                                            )
-                                            ? Image.asset(
-                                              appliedJob['avatar'],
-                                              width: 60,
-                                              height: 60,
-                                              fit: BoxFit.cover,
-                                            )
-                                            : Image.file(
-                                              File(appliedJob['avatar']),
-                                              width: 60,
-                                              height: 60,
-                                              fit: BoxFit.cover,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              color: AppColors.grey,
+                              child: Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Row(
+                                  children: [
+                                    ClipOval(
+                                      child:
+                                          appliedJob['avatar'].startsWith(
+                                                'assets/',
+                                              )
+                                              ? Image.asset(
+                                                appliedJob['avatar'],
+                                                width: 60,
+                                                height: 60,
+                                                fit: BoxFit.cover,
+                                              )
+                                              : Image.file(
+                                                File(appliedJob['avatar']),
+                                                width: 60,
+                                                height: 60,
+                                                fit: BoxFit.cover,
+                                              ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            appliedJob['employeeName'],
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
+                                              color: AppColors.black,
                                             ),
-                                  ),
-                                  SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          appliedJob['employee'],
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: AppColors.black,
                                           ),
-                                        ),
-                                        Text(
-                                          appliedJob['profile']['title'],
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: AppColors.black,
+                                          Text(
+                                            appliedJob['profile']['title'],
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: AppColors.black,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
+                          );
+                        } else {
+                          return SizedBox.shrink();
+                        }
                       },
                     );
                   }

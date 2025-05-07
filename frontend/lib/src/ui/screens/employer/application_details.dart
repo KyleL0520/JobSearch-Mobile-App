@@ -1,17 +1,71 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:frontend/database/service/job.dart';
 import 'package:frontend/src/styles/app_colors.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
 import 'package:frontend/src/ui/widgets/button/redButton.dart';
 import 'package:frontend/src/ui/widgets/button/yellowButton.dart';
 import 'package:frontend/src/ui/widgets/card.dart';
+import 'package:frontend/src/ui/widgets/snackbar/snack_bar.dart';
 import 'package:frontend/src/ui/widgets/title/form_title.dart';
 
-class ApplicationDetailsScreen extends StatelessWidget {
+class ApplicationDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> appliedJob;
-  const ApplicationDetailsScreen({super.key, required this.appliedJob});
+  final bool isAccepted;
+  const ApplicationDetailsScreen({
+    super.key,
+    required this.appliedJob,
+    required this.isAccepted,
+  });
 
-  void temp() {}
+  @override
+  State<ApplicationDetailsScreen> createState() =>
+      _ApplicationDetailsScreenState();
+}
+
+class _ApplicationDetailsScreenState extends State<ApplicationDetailsScreen> {
+  final jobService = JobService();
+
+  void acceptApplication() async {
+    try {
+      await jobService.acceptApplication(
+        applicationId: widget.appliedJob['applicationId'],
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar.successSnackBar(
+          title: 'Application accepted successfully',
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar.failedSnackBar(title: 'Failed to accept application'),
+      );
+    }
+
+    Navigator.pop(context);
+  }
+
+  void rejectApplication() async {
+    try {
+      await jobService.rejectApplication(
+        applicationId: widget.appliedJob['applicationId'],
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar.successSnackBar(
+          title: 'Application rejected successfully',
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar.failedSnackBar(title: 'Failed to reject application'),
+      );
+    }
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,15 +81,15 @@ class ApplicationDetailsScreen extends StatelessWidget {
               Center(
                 child: ClipOval(
                   child:
-                      appliedJob['avatar'].startsWith('assets/')
+                      widget.appliedJob['avatar'].startsWith('assets/')
                           ? Image.asset(
-                            appliedJob['avatar'],
+                            widget.appliedJob['avatar'],
                             width: 120,
                             height: 120,
                             fit: BoxFit.cover,
                           )
                           : Image.file(
-                            File(appliedJob['avatar']),
+                            File(widget.appliedJob['avatar']),
                             width: 120,
                             height: 120,
                             fit: BoxFit.cover,
@@ -47,7 +101,7 @@ class ApplicationDetailsScreen extends StatelessWidget {
                 children: [
                   Image.asset('assets/icons/job.png', width: 18, height: 18),
                   const SizedBox(width: 15),
-                  Text(appliedJob['profile']['title']),
+                  Text(widget.appliedJob['profile']['title']),
                 ],
               ),
               const SizedBox(height: 10),
@@ -55,7 +109,7 @@ class ApplicationDetailsScreen extends StatelessWidget {
                 children: [
                   const Icon(Icons.email_outlined, color: AppColors.white),
                   const SizedBox(width: 10),
-                  Text(appliedJob['email']),
+                  Text(widget.appliedJob['email']),
                 ],
               ),
               const SizedBox(height: 30),
@@ -63,7 +117,7 @@ class ApplicationDetailsScreen extends StatelessWidget {
               const SizedBox(height: 10),
               Column(
                 children:
-                    (appliedJob['profile']['careerHistorys'] as List)
+                    (widget.appliedJob['profile']['careerHistorys'] as List)
                         .map<Widget>(
                           (career) => Row(
                             children: [
@@ -85,7 +139,7 @@ class ApplicationDetailsScreen extends StatelessWidget {
               const SizedBox(height: 10),
               Column(
                 children:
-                    (appliedJob['profile']['educations'] as List)
+                    (widget.appliedJob['profile']['educations'] as List)
                         .map<Widget>(
                           (education) => Row(
                             children: [
@@ -109,7 +163,7 @@ class ApplicationDetailsScreen extends StatelessWidget {
                 spacing: 10,
                 runSpacing: 10,
                 children:
-                    (appliedJob['profile']['skills'] as List)
+                    (widget.appliedJob['profile']['skills'] as List)
                         .map<Widget>((skill) => _pointCard(skill['label']))
                         .toList(),
               ),
@@ -120,21 +174,33 @@ class ApplicationDetailsScreen extends StatelessWidget {
                 spacing: 10,
                 runSpacing: 10,
                 children:
-                    (appliedJob['profile']['languages'] as List)
+                    (widget.appliedJob['profile']['languages'] as List)
                         .map<Widget>(
                           (language) => _pointCard(language['label']),
                         )
                         .toList(),
               ),
               const SizedBox(height: 30),
-              Row(
-                children: [
-                  Expanded(child: RedButton(text: 'Reject', function: temp)),
-                  const SizedBox(width: 10),
-                  Expanded(child: YellowButton(text: 'Accept', function: temp)),
-                ],
-              ),
-              const SizedBox(height: 20),
+              widget.isAccepted
+                  ? SizedBox()
+                  : Row(
+                    children: [
+                      Expanded(
+                        child: RedButton(
+                          text: 'Reject',
+                          function: rejectApplication,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: YellowButton(
+                          text: 'Accept',
+                          function: acceptApplication,
+                        ),
+                      ),
+                    ],
+                  ),
+              const SizedBox(height: 30),
             ],
           ),
         ),

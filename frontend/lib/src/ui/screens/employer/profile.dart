@@ -6,6 +6,7 @@ import 'package:frontend/database/auth/auth_service.dart';
 import 'package:frontend/database/database_service.dart';
 import 'package:frontend/src/ui/screens/edit_password.dart';
 import 'package:frontend/src/ui/screens/employer/edit_profile.dart';
+import 'package:frontend/src/ui/screens/employer/application_accepted.dart';
 import 'package:frontend/src/ui/screens/login.dart';
 import 'package:frontend/src/ui/widgets/app_bar.dart';
 import 'package:frontend/src/ui/widgets/button/section.dart';
@@ -39,6 +40,8 @@ class _EmployerProfileScreenState extends State<EmployerProfileScreen> {
     final avatar = await getAvatar(uid);
     await FirebaseAuth.instance.currentUser?.reload();
     final displayName = authService.value.currentUser!.displayName ?? 'Profile';
+
+    if (!mounted) return;
 
     setState(() {
       _avatar = avatar ?? 'assets/images/userAvatar.png';
@@ -95,6 +98,12 @@ class _EmployerProfileScreenState extends State<EmployerProfileScreen> {
               icon: Icons.lock_outline,
               title: 'Edit Password',
               action: EditPasswordScreen(uid: uid),
+            ),
+            const SizedBox(height: 20),
+            SectionButton(
+              icon: Icons.edit_document,
+              title: 'Application Accepted',
+              action: ApplicationAcceptedScreen(),
             ),
             const SizedBox(height: 20),
             SectionButton(
