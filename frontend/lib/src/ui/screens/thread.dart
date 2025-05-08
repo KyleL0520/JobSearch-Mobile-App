@@ -271,6 +271,22 @@ class _ThreadScreenState extends State<ThreadScreen> {
     }
   }
 
+  Map<String, List<Map<String, dynamic>>> groupRepliesByParent(
+    List<Map<String, dynamic>> replies,
+  ) {
+    final Map<String, List<Map<String, dynamic>>> grouped = {};
+
+    for (final reply in replies) {
+      final parentId = reply['replyId'];
+      if (grouped[parentId] == null) {
+        grouped[parentId] = [];
+      }
+      grouped[parentId]!.add(reply);
+    }
+
+    return grouped;
+  }
+
   @override
   void dispose() {
     commentController.dispose();
@@ -396,203 +412,216 @@ class _ThreadScreenState extends State<ThreadScreen> {
                     return SizedBox();
                   } else {
                     final replys = snapshot.data!;
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: replys.length,
-                      itemBuilder: (context, index) {
-                        final reply = replys[index];
-                        final commentId = reply['commentId'];
-                        bool isLiked = likedComments[commentId] ?? false;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 15),
-                          child: Slidable(
-                            endActionPane: ActionPane(
-                              motion: const BehindMotion(),
-                              children: [
-                                reply['userId'] == _uid
-                                    ? SlidableAction(
-                                      onPressed:
-                                          (context) => deleteReply(
-                                            reply['commentId'],
-                                            reply['threadId'],
-                                            reply['replyId'],
-                                          ),
-                                      backgroundColor: AppColors.red,
-                                      label: 'Delete',
-                                    )
-                                    : SizedBox(),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    ClipOval(
-                                      child:
-                                          reply['avatar'].startsWith('assets/')
-                                              ? Image.asset(
-                                                reply['avatar'],
-                                                width: 40,
-                                                height: 40,
-                                                fit: BoxFit.cover,
-                                              )
-                                              : Image.file(
-                                                File(reply['avatar']),
-                                                width: 40,
-                                                height: 40,
-                                                fit: BoxFit.cover,
-                                              ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    FutureBuilder<String?>(
-                                      future:
-                                          reply['replyId'] !=
-                                                  widget.comment['commentId']
-                                              ? readReplyName(reply['replyId'])
-                                              : Future.value(reply['username']),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Text(
-                                            'Replied to ...',
-                                            style: TextStyle(
-                                              color: AppColors.white,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          );
-                                        } else if (snapshot.hasError ||
-                                            !snapshot.hasData) {
-                                          return Text(
-                                            'Replied to Unknown',
-                                            style: TextStyle(
-                                              color: AppColors.white,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          );
-                                        } else {
-                                          return Text(
-                                            reply['replyId'] !=
-                                                    widget.comment['commentId']
-                                                ? "Replied to ${snapshot.data}"
-                                                : "${snapshot.data}",
-                                            style: TextStyle(
-                                              color: AppColors.white,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                ),
-
-                                SizedBox(height: 10),
-                                Text(
-                                  reply['comment'],
-                                  style: TextStyle(
-                                    color: AppColors.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () async {
-                                        final newIsLiked = !isLiked;
-                                        if (newIsLiked) {
-                                          reply['like'].add(_uid);
-                                        } else {
-                                          reply['like'].remove(_uid);
-                                        }
-
-                                        await communityService
-                                            .toggleLikeComment(
-                                              commentId,
-                                              newIsLiked,
-                                            );
-
-                                        setState(() {
-                                          likedComments[commentId] = newIsLiked;
-                                        });
-                                      },
-                                      icon:
-                                          isLiked
-                                              ? Icon(
-                                                Icons.favorite,
-                                                color: AppColors.red,
-                                                size: 18,
-                                              )
-                                              : Icon(
-                                                Icons.favorite_border,
-                                                color: AppColors.white,
-                                                size: 18,
-                                              ),
-                                    ),
-                                    SizedBox(width: 5),
-                                    Text(
-                                      reply['like'].length.toString(),
-                                      style: TextStyle(
-                                        color: AppColors.white,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    SizedBox(width: 20),
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            PopupForm.show(
-                                              context: context,
-                                              title:
-                                                  "Reply to ${reply['username']}",
-                                              btnSubmit: true,
-                                              function:
-                                                  () => submitReply(
-                                                    reply['commentId'],
-                                                  ),
-                                              child: Column(
-                                                children: [
-                                                  SizedBox(height: 30),
-                                                  CommentTextField(
-                                                    commentController:
-                                                        commentController,
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                          icon: Icon(
-                                            Icons.chat_bubble_outline,
-                                            color: AppColors.white,
-                                            size: 18,
-                                          ),
-                                        ),
-                                        SizedBox(width: 5),
-                                        Text(
-                                          reply['reply'].toString(),
-                                          style: TextStyle(
-                                            color: AppColors.white,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                    final groupedReplies = groupRepliesByParent(replys);
+                    return SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
+                      child: buildReplies(
+                        groupedReplies: groupedReplies,
+                        parentId: widget.comment['commentId'],
+                      ),
                     );
+
+                    // final replys = snapshot.data!;
+                    // return ListView.builder(
+                    //   shrinkWrap: true,
+                    //   physics: const BouncingScrollPhysics(),
+                    //   itemCount: replys.length,
+                    //   itemBuilder: (context, index) {
+                    //     final reply = replys[index];
+                    //     final commentId = reply['commentId'];
+                    //     bool isLiked = likedComments[commentId] ?? false;
+                    //     return Padding(
+                    //       padding: const EdgeInsets.only(bottom: 15),
+                    //       child: Slidable(
+                    //         endActionPane: ActionPane(
+                    //           motion: const BehindMotion(),
+                    //           children: [
+                    //             reply['userId'] == _uid
+                    //                 ? SlidableAction(
+                    //                   onPressed:
+                    //                       (context) => deleteReply(
+                    //                         reply['commentId'],
+                    //                         reply['threadId'],
+                    //                         reply['replyId'],
+                    //                       ),
+                    //                   backgroundColor: AppColors.red,
+                    //                   label: 'Delete',
+                    //                 )
+                    //                 : SizedBox(),
+                    //           ],
+                    //         ),
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: [
+                    //             const SizedBox(height: 10),
+                    //             reply['replyId'] != widget.comment['commentId']
+                    //                 ? const SizedBox(width: 20)
+                    //                 : SizedBox(),
+                    //             Row(
+                    //               children: [
+                    //                 ClipOval(
+                    //                   child:
+                    //                       reply['avatar'].startsWith('assets/')
+                    //                           ? Image.asset(
+                    //                             reply['avatar'],
+                    //                             width: 40,
+                    //                             height: 40,
+                    //                             fit: BoxFit.cover,
+                    //                           )
+                    //                           : Image.file(
+                    //                             File(reply['avatar']),
+                    //                             width: 40,
+                    //                             height: 40,
+                    //                             fit: BoxFit.cover,
+                    //                           ),
+                    //                 ),
+                    //                 SizedBox(width: 10),
+                    //                 FutureBuilder<String?>(
+                    //                   future:
+                    //                       reply['replyId'] !=
+                    //                               widget.comment['commentId']
+                    //                           ? readReplyName(reply['replyId'])
+                    //                           : Future.value(reply['username']),
+                    //                   builder: (context, snapshot) {
+                    //                     if (snapshot.connectionState ==
+                    //                         ConnectionState.waiting) {
+                    //                       return Text(
+                    //                         'Replied to ...',
+                    //                         style: TextStyle(
+                    //                           color: AppColors.white,
+                    //                           fontSize: 16,
+                    //                           fontWeight: FontWeight.bold,
+                    //                         ),
+                    //                       );
+                    //                     } else if (snapshot.hasError ||
+                    //                         !snapshot.hasData) {
+                    //                       return Text(
+                    //                         'Replied to Unknown',
+                    //                         style: TextStyle(
+                    //                           color: AppColors.white,
+                    //                           fontSize: 16,
+                    //                           fontWeight: FontWeight.bold,
+                    //                         ),
+                    //                       );
+                    //                     } else {
+                    //                       return Text(
+                    //                         reply['replyId'] !=
+                    //                                 widget.comment['commentId']
+                    //                             ? "Replied to ${snapshot.data}"
+                    //                             : "${snapshot.data}",
+                    //                         style: TextStyle(
+                    //                           color: AppColors.white,
+                    //                           fontSize: 16,
+                    //                           fontWeight: FontWeight.bold,
+                    //                         ),
+                    //                       );
+                    //                     }
+                    //                   },
+                    //                 ),
+                    //               ],
+                    //             ),
+
+                    //             SizedBox(height: 10),
+                    //             Text(
+                    //               reply['comment'],
+                    //               style: TextStyle(
+                    //                 color: AppColors.white,
+                    //                 fontSize: 14,
+                    //               ),
+                    //             ),
+                    //             SizedBox(height: 10),
+                    //             Row(
+                    //               mainAxisAlignment: MainAxisAlignment.end,
+                    //               children: [
+                    //                 IconButton(
+                    //                   onPressed: () async {
+                    //                     final newIsLiked = !isLiked;
+                    //                     if (newIsLiked) {
+                    //                       reply['like'].add(_uid);
+                    //                     } else {
+                    //                       reply['like'].remove(_uid);
+                    //                     }
+
+                    //                     await communityService
+                    //                         .toggleLikeComment(
+                    //                           commentId,
+                    //                           newIsLiked,
+                    //                         );
+
+                    //                     setState(() {
+                    //                       likedComments[commentId] = newIsLiked;
+                    //                     });
+                    //                   },
+                    //                   icon:
+                    //                       isLiked
+                    //                           ? Icon(
+                    //                             Icons.favorite,
+                    //                             color: AppColors.red,
+                    //                             size: 18,
+                    //                           )
+                    //                           : Icon(
+                    //                             Icons.favorite_border,
+                    //                             color: AppColors.white,
+                    //                             size: 18,
+                    //                           ),
+                    //                 ),
+                    //                 SizedBox(width: 5),
+                    //                 Text(
+                    //                   reply['like'].length.toString(),
+                    //                   style: TextStyle(
+                    //                     color: AppColors.white,
+                    //                     fontSize: 14,
+                    //                   ),
+                    //                 ),
+                    //                 SizedBox(width: 20),
+                    //                 Row(
+                    //                   children: [
+                    //                     IconButton(
+                    //                       onPressed: () {
+                    //                         PopupForm.show(
+                    //                           context: context,
+                    //                           title:
+                    //                               "Reply to ${reply['username']}",
+                    //                           btnSubmit: true,
+                    //                           function:
+                    //                               () => submitReply(
+                    //                                 reply['commentId'],
+                    //                               ),
+                    //                           child: Column(
+                    //                             children: [
+                    //                               SizedBox(height: 30),
+                    //                               CommentTextField(
+                    //                                 commentController:
+                    //                                     commentController,
+                    //                               ),
+                    //                             ],
+                    //                           ),
+                    //                         );
+                    //                       },
+                    //                       icon: Icon(
+                    //                         Icons.chat_bubble_outline,
+                    //                         color: AppColors.white,
+                    //                         size: 18,
+                    //                       ),
+                    //                     ),
+                    //                     SizedBox(width: 5),
+                    //                     Text(
+                    //                       reply['reply'].toString(),
+                    //                       style: TextStyle(
+                    //                         color: AppColors.white,
+                    //                         fontSize: 14,
+                    //                       ),
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ],
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     );
+                    //   },
+                    // );
                   }
                 },
               ),
@@ -632,6 +661,167 @@ class _ThreadScreenState extends State<ThreadScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildReplies({
+    required Map<String, List<Map<String, dynamic>>> groupedReplies,
+    required String parentId,
+    double indent = 0,
+  }) {
+    final replies = groupedReplies[parentId] ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children:
+          replies.map((reply) {
+            final commentId = reply['commentId'];
+            final isLiked = likedComments[commentId] ?? false;
+
+            return Padding(
+              padding: EdgeInsets.only(left: indent, bottom: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  buildSingleReply(reply, isLiked),
+                  buildReplies(
+                    groupedReplies: groupedReplies,
+                    parentId: reply['commentId'],
+                    indent: indent + 20,
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+    );
+  }
+
+  Widget buildSingleReply(Map<String, dynamic> reply, bool isLiked) {
+    final commentId = reply['commentId'];
+    final bool isNestedReply = reply['replyId'] != widget.comment['commentId'];
+
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: const BehindMotion(),
+        children: [
+          if (reply['userId'] == _uid)
+            SlidableAction(
+              onPressed:
+                  (context) => deleteReply(
+                    reply['commentId'],
+                    reply['threadId'],
+                    reply['replyId'],
+                  ),
+              backgroundColor: AppColors.red,
+              label: 'Delete',
+            ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              ClipOval(
+                child:
+                    reply['avatar'].startsWith('assets/')
+                        ? Image.asset(
+                          reply['avatar'],
+                          width: isNestedReply ? 30 : 40,
+                          height: isNestedReply ? 30 : 40,
+                          fit: BoxFit.cover,
+                        )
+                        : Image.file(
+                          File(reply['avatar']),
+                          width: isNestedReply ? 30 : 40,
+                          height: isNestedReply ? 30 : 40,
+                          fit: BoxFit.cover,
+                        ),
+              ),
+              SizedBox(width: 10),
+              FutureBuilder<String?>(
+                future: readReplyName(reply['replyId']),
+                builder: (context, snapshot) {
+                  final username = snapshot.data ?? 'Unknown';
+                  return Text(
+                    isNestedReply ? "Replied to $username" : reply['username'],
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: isNestedReply ? 14 : 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          Text(
+            reply['comment'],
+            style: TextStyle(color: AppColors.white, fontSize: 14),
+          ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: () async {
+                  final newIsLiked = !isLiked;
+                  await communityService.toggleLikeComment(
+                    commentId,
+                    newIsLiked,
+                  );
+                  setState(() {
+                    likedComments[commentId] = newIsLiked;
+                    if (newIsLiked) {
+                      reply['like'].add(_uid);
+                    } else {
+                      reply['like'].remove(_uid);
+                    }
+                  });
+                },
+                icon:
+                    isLiked
+                        ? Icon(Icons.favorite, color: AppColors.red, size: 18)
+                        : Icon(
+                          Icons.favorite_border,
+                          color: AppColors.white,
+                          size: 18,
+                        ),
+              ),
+              Text(
+                reply['like'].length.toString(),
+                style: TextStyle(color: AppColors.white),
+              ),
+              IconButton(
+                onPressed: () {
+                  PopupForm.show(
+                    context: context,
+                    title: "Reply to ${reply['username']}",
+                    btnSubmit: true,
+                    function: () => submitReply(reply['commentId']),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 30),
+                        CommentTextField(commentController: commentController),
+                      ],
+                    ),
+                  );
+                },
+                icon: Icon(
+                  Icons.chat_bubble_outline,
+                  color: AppColors.white,
+                  size: 18,
+                ),
+              ),
+              Text(
+                reply['reply'].toString(),
+                style: TextStyle(color: AppColors.white),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

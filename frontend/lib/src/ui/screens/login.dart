@@ -88,6 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }
 
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(
         context,
