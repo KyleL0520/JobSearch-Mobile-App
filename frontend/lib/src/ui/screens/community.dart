@@ -29,7 +29,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   late Future<List<Map<String, dynamic>>> communityFuture;
 
-  void _clearCareerHistoryForm() {
+  void _clearCommentForm() {
     commentController.clear();
   }
 
@@ -101,7 +101,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       print('Created failed : $e');
     }
     Navigator.pop(context);
-    _clearCareerHistoryForm();
+    _clearCommentForm();
     refreshComments();
   }
 
